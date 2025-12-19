@@ -71,4 +71,30 @@ describe('validateAndPrepareCreditCardData', () => {
 
     expect(validateAndPrepareCustomFields).toHaveBeenCalledWith(customFields)
   })
+
+  describe('note to comment migration', () => {
+    it('should migrate legacy note field to comment', () => {
+      const creditCardWithNote = {
+        title: 'My Credit Card',
+        note: 'This is a legacy note'
+      }
+
+      const result = validateAndPrepareCreditCardData(creditCardWithNote)
+
+      expect(result.comment).toBe('This is a legacy note')
+      expect(result.note).toBeUndefined()
+    })
+
+    it('should prefer comment over note when both exist', () => {
+      const creditCardWithBoth = {
+        title: 'My Credit Card',
+        note: 'Legacy note',
+        comment: 'New comment'
+      }
+
+      const result = validateAndPrepareCreditCardData(creditCardWithBoth)
+
+      expect(result.comment).toBe('New comment')
+    })
+  })
 })

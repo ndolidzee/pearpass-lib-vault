@@ -131,4 +131,44 @@ describe('validateAndPrepareLoginData', () => {
       customFields: []
     })
   })
+
+  describe('note to comment migration', () => {
+    test('should migrate legacy note field to comment', () => {
+      const loginData = {
+        title: 'My Login',
+        note: 'This is a legacy note',
+        websites: ['https://example.com']
+      }
+
+      const result = validateAndPrepareLoginData(loginData)
+
+      expect(result.comment).toBe('This is a legacy note')
+      expect(result.note).toBeUndefined()
+    })
+
+    test('should prefer comment over note when both exist', () => {
+      const loginData = {
+        title: 'My Login',
+        note: 'Legacy note',
+        comment: 'New comment',
+        websites: ['https://example.com']
+      }
+
+      const result = validateAndPrepareLoginData(loginData)
+
+      expect(result.comment).toBe('New comment')
+    })
+
+    test('should handle empty legacy note', () => {
+      const loginData = {
+        title: 'My Login',
+        note: '',
+        websites: ['https://example.com']
+      }
+
+      const result = validateAndPrepareLoginData(loginData)
+
+      expect(result.comment).toBe('')
+    })
+  })
 })

@@ -4,6 +4,7 @@ import {
   customFieldSchema,
   validateAndPrepareCustomFields
 } from './validateAndPrepareCustomFields'
+import { migrateNoteToComment } from './migrateNoteToComment'
 
 export const passPhraseSchema = Validator.object({
   title: Validator.string().required(),
@@ -16,7 +17,7 @@ export const validateAndPreparePassPhraseData = (passPhrase) => {
   const passPhraseData = {
     title: passPhrase.title,
     passPhrase: passPhrase.passPhrase,
-    comment: passPhrase.comment,
+    comment: migrateNoteToComment(passPhrase),
     customFields: validateAndPrepareCustomFields(passPhrase.customFields)
   }
 

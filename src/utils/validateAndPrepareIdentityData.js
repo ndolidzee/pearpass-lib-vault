@@ -6,6 +6,7 @@ import {
   validateAndPrepareCustomFields
 } from './validateAndPrepareCustomFields'
 import { fileSchema } from '../schemas/fileSchema'
+import { migrateNoteToComment } from './migrateNoteToComment'
 
 export const identitySchema = Validator.object({
   title: Validator.string().required(),
@@ -52,7 +53,7 @@ export const validateAndPrepareIdentityData = (identity) => {
     city: identity.city,
     region: identity.region,
     country: identity.country,
-    comment: identity.comment,
+    comment: migrateNoteToComment(identity),
     customFields: validateAndPrepareCustomFields(identity.customFields),
     passportFullName: identity.passportFullName,
     passportNumber: identity.passportNumber,

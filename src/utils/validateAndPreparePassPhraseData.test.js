@@ -126,4 +126,36 @@ describe('validateAndPreparePassPhraseData', () => {
       'Invalid pass phrase data'
     )
   })
+
+  describe('note to comment migration', () => {
+    test('should migrate legacy note field to comment', () => {
+      const passPhraseData = {
+        title: 'My Passphrase',
+        passPhrase: 'correct horse battery staple',
+        note: 'This is a legacy note'
+      }
+
+      validateAndPrepareCustomFields.mockReturnValue([])
+
+      const result = validateAndPreparePassPhraseData(passPhraseData)
+
+      expect(result.comment).toBe('This is a legacy note')
+      expect(result.note).toBeUndefined()
+    })
+
+    test('should prefer comment over note when both exist', () => {
+      const passPhraseData = {
+        title: 'My Passphrase',
+        passPhrase: 'correct horse battery staple',
+        note: 'Legacy note',
+        comment: 'New comment'
+      }
+
+      validateAndPrepareCustomFields.mockReturnValue([])
+
+      const result = validateAndPreparePassPhraseData(passPhraseData)
+
+      expect(result.comment).toBe('New comment')
+    })
+  })
 })
