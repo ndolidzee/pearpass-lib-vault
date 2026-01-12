@@ -75,7 +75,8 @@ const matchRecordToSearchPattern = (searchPattern, record) => {
     note,
     name,
     fullName,
-    websites = []
+    websites = [],
+    customFields = []
   } = record.data
 
   const valuesToSearch = [
@@ -85,7 +86,8 @@ const matchRecordToSearchPattern = (searchPattern, record) => {
     note,
     name,
     fullName,
-    ...websites
+    ...websites,
+    ...customFields.map((field) => field.note)
   ]
 
   return valuesToSearch.some((value) =>
