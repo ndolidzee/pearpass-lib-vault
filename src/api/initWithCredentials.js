@@ -13,6 +13,12 @@ export const initWithCredentials = async (params) => {
     throw new Error('Missing required parameters')
   }
 
+  const statusRes = await pearpassVaultClient.encryptionGetStatus()
+
+  if (!statusRes?.status) {
+    await pearpassVaultClient.encryptionInit()
+  }
+
   const decryptVaultKeyRes = await pearpassVaultClient.decryptVaultKey({
     ciphertext: params.ciphertext,
     nonce: params.nonce,
