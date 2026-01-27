@@ -43,6 +43,7 @@ describe('validateAndPrepareLoginData', () => {
       username: 'user123',
       password: 'password123',
       credential: mockCredential,
+      passkeyCreatedAt: 1234567890,
       note: 'This is a note',
       websites: ['https://example.com'],
       customFields: [{ name: 'field1', value: 'value1', type: 'text' }]
