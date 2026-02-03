@@ -1,3 +1,5 @@
+import { constantTimeHashCompare } from 'pearpass-lib-vault-core'
+
 import { pearpassVaultClient } from '../instances'
 import { getMasterPasswordEncryption } from './getMasterPasswordEncryption'
 import { updateVaultPassword } from './helpers/updateVaultPassword'
@@ -63,7 +65,12 @@ const updateActiveProtectedVault = async ({
     password: currentPassword
   })
 
-  if (activeVault.encryption.hashedPassword !== currentHashedPassword) {
+  if (
+    !constantTimeHashCompare(
+      activeVault.encryption.hashedPassword,
+      currentHashedPassword
+    )
+  ) {
     throw new Error('Invalid password')
   }
 

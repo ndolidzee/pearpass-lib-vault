@@ -1,3 +1,5 @@
+import { constantTimeHashCompare } from 'pearpass-lib-vault-core'
+
 import { pearpassVaultClient } from '../instances'
 import { getCurrentProtectedVaultEncryption } from './getCurrentProtectedVaultEncryption'
 import { getCurrentVault } from './getCurrentVault'
@@ -18,7 +20,7 @@ export const authoriseCurrentProtectedVault = async (password) => {
     password: password
   })
 
-  if (hashedPassword !== currentHashedPassword) {
+  if (!constantTimeHashCompare(hashedPassword, currentHashedPassword)) {
     throw new Error('Invalid password')
   }
 
