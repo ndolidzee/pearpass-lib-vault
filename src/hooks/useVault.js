@@ -134,6 +134,19 @@ export const useVault = ({ variables } = {}) => {
     }
   }
 
+  const syncVault = async () => {
+    const backendVault = await getCurrentVault()
+
+    if (backendVault?.id && backendVault.id !== data?.id) {
+      await dispatch(getVaults())
+      await fetchVault(backendVault.id)
+
+      return true
+    }
+
+    return false
+  }
+
   const resetState = () => {
     dispatch(resetStateAction())
   }
@@ -147,6 +160,7 @@ export const useVault = ({ variables } = {}) => {
     isVaultProtected,
     resetState,
     updateUnprotectedVault,
-    updateProtectedVault
+    updateProtectedVault,
+    syncVault
   }
 }
