@@ -34,6 +34,7 @@ import { logger } from '../utils/logger'
  *        }) => Promise<any>
  *      isVaultProtected: (vaultId: string) => Promise<boolean>
  *      resetState: () => void
+ *      syncVault: () => Promise<boolean>
  *  }}
  */
 export const useVault = ({ variables } = {}) => {
