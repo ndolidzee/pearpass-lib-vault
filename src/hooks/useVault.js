@@ -34,6 +34,7 @@ import { logger } from '../utils/logger'
  *        }) => Promise<any>
  *      isVaultProtected: (vaultId: string) => Promise<boolean>
  *      resetState: () => void
+ *      syncVault: () => Promise<boolean>
  *  }}
  */
 export const useVault = ({ variables } = {}) => {
@@ -137,6 +138,19 @@ export const useVault = ({ variables } = {}) => {
     }
   }
 
+  const syncVault = async () => {
+    const backendVault = await getCurrentVault()
+
+    if (backendVault?.id && backendVault.id !== data?.id) {
+      await dispatch(getVaults())
+      await fetchVault(backendVault.id)
+
+      return true
+    }
+
+    return false
+  }
+
   const resetState = () => {
     dispatch(resetStateAction())
   }
@@ -150,6 +164,7 @@ export const useVault = ({ variables } = {}) => {
     isVaultProtected,
     resetState,
     updateUnprotectedVault,
-    updateProtectedVault
+    updateProtectedVault,
+    syncVault
   }
 }
