@@ -20,7 +20,6 @@ export { closeAllInstances } from './api/closeAllInstances'
 export { setPearpassVaultClient, setStoragePath } from './instances'
 
 export { authoriseCurrentProtectedVault } from './api/authoriseCurrentProtectedVault'
-export { fetchFavicon } from './api/fetchFavicon'
 export { getVaultById } from './api/getVaultById'
 export { getCurrentProtectedVaultEncryption } from './api/getCurrentProtectedVaultEncryption'
 export { listRecords } from './api/listRecords'

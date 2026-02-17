@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import { fetchFavicon } from '../api/fetchFavicon'
+import { pearpassVaultClient } from '../instances'
 
 /**
  * Hook to fetch and manage favicon state for a given URL
@@ -30,7 +30,11 @@ export const useFavicon = (params) => {
 
     const loadFavicon = async () => {
       try {
-        const res = await fetchFavicon(url)
+        if (!pearpassVaultClient) {
+          throw new Error('Pearpass vault client is not initialized')
+        }
+
+        const res = await pearpassVaultClient.fetchFavicon(url)
 
         if (res && res.favicon) {
           setFaviconSrc(res.favicon)

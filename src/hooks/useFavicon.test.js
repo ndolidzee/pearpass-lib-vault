@@ -1,16 +1,19 @@
 import { renderHook, waitFor } from '@testing-library/react'
 
 import { useFavicon } from './useFavicon'
-import { fetchFavicon } from '../api/fetchFavicon'
+import { setPearpassVaultClient } from '../instances'
 
-jest.mock('../api/fetchFavicon', () => ({
-  fetchFavicon: jest.fn()
-}))
+const mockFetchFavicon = jest.fn()
+
+const mockClient = {
+  fetchFavicon: mockFetchFavicon
+}
 
 describe('useFavicon', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     console.warn = jest.fn()
+    setPearpassVaultClient(mockClient)
   })
 
   test('should return initial state correctly', () => {
@@ -25,7 +28,7 @@ describe('useFavicon', () => {
 
   test('should fetch favicon successfully', async () => {
     const mockFavicon = 'blob:http://example.com/favicon'
-    fetchFavicon.mockResolvedValue({ favicon: mockFavicon })
+    mockFetchFavicon.mockResolvedValue({ favicon: mockFavicon })
 
     const { result } = renderHook(() =>
       useFavicon({ url: 'http://example.com' })
@@ -43,11 +46,11 @@ describe('useFavicon', () => {
       isLoading: false,
       hasError: false
     })
-    expect(fetchFavicon).toHaveBeenCalledWith('http://example.com')
+    expect(mockFetchFavicon).toHaveBeenCalledWith('http://example.com')
   })
 
   test('should handle missing favicon in response', async () => {
-    fetchFavicon.mockResolvedValue({ favicon: null })
+    mockFetchFavicon.mockResolvedValue({ favicon: null })
 
     const { result } = renderHook(() =>
       useFavicon({ url: 'http://example.com' })
@@ -66,7 +69,7 @@ describe('useFavicon', () => {
 
   test('should handle fetch errors', async () => {
     const error = new Error('Network error')
-    fetchFavicon.mockRejectedValue(error)
+    mockFetchFavicon.mockRejectedValue(error)
 
     const { result } = renderHook(() =>
       useFavicon({ url: 'http://example.com' })
@@ -88,14 +91,14 @@ describe('useFavicon', () => {
     const { result } = renderHook(() => useFavicon({ url: '' }))
 
     expect(result.current.faviconSrc).toBeNull()
-    expect(fetchFavicon).not.toHaveBeenCalled()
+    expect(mockFetchFavicon).not.toHaveBeenCalled()
   })
 
   test('should update when url changes', async () => {
     const mockFavicon1 = 'blob:1'
     const mockFavicon2 = 'blob:2'
 
-    fetchFavicon
+    mockFetchFavicon
       .mockResolvedValueOnce({ favicon: mockFavicon1 })
       .mockResolvedValueOnce({ favicon: mockFavicon2 })
 
@@ -115,6 +118,6 @@ describe('useFavicon', () => {
       expect(result.current.faviconSrc).toBe(mockFavicon2)
     })
 
-    expect(fetchFavicon).toHaveBeenCalledTimes(2)
+    expect(mockFetchFavicon).toHaveBeenCalledTimes(2)
   })
 })
