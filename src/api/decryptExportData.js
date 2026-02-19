@@ -21,5 +21,5 @@ export const decryptExportData = async (encryptedData, password) => {
     throw new Error('Password is required for decryption')
   }
 
-  return await pearpassVaultClient.decryptExportData(encryptedData, password)
+  return pearpassVaultClient.decryptExportData(encryptedData, password)
 }
