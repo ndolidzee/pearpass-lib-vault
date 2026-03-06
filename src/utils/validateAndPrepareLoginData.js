@@ -1,5 +1,6 @@
 import { Validator } from 'pear-apps-utils-validator'
 
+import { parseOtpInput } from './parseOtpInput'
 import {
   customFieldSchema,
   validateAndPrepareCustomFields
@@ -54,6 +55,8 @@ export const loginSchema = Validator.object({
 })
 
 export const validateAndPrepareLoginData = (login) => {
+  const otp = login.otpInput ? parseOtpInput(login.otpInput) : login.otp
+
   const loginData = {
     title: login.title,
     username: login.username,
@@ -65,7 +68,7 @@ export const validateAndPrepareLoginData = (login) => {
     websites: login.websites,
     customFields: validateAndPrepareCustomFields(login.customFields),
     attachments: login.attachments,
-    otp: login.otp
+    otp
   }
 
   const errors = loginSchema.validate(loginData)
