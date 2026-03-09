@@ -51,7 +51,8 @@ export const loginSchema = Validator.object({
   websites: Validator.array().items(Validator.string().required()),
   customFields: Validator.array().items(customFieldSchema),
   attachments: Validator.array().items(fileSchema),
-  otp: otpSchema
+  otp: otpSchema,
+  otpInput: Validator.string()
 })
 
 export const validateAndPrepareLoginData = (login) => {
@@ -68,7 +69,8 @@ export const validateAndPrepareLoginData = (login) => {
     websites: login.websites,
     customFields: validateAndPrepareCustomFields(login.customFields),
     attachments: login.attachments,
-    otp
+    otp,
+    otpInput: login.otpInput
   }
 
   const errors = loginSchema.validate(loginData)
