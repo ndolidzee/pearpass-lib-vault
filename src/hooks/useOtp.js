@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 
 import { useDispatch } from 'react-redux'
 
-import { useOtpRefresh } from './useOtpCodes'
+import { useOtpRefresh } from './useOtpRefresh'
 import { generateHotpNext } from '../api/generateHotpNext'
 import { OTP_TYPE } from '../constants/otpType'
 import { updateOtpCodes } from '../slices/otpSlice'

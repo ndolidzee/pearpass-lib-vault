@@ -1,20 +1,12 @@
-import {
-  createContext,
-  createElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef
-} from 'react'
+import { createElement, useCallback, useEffect, useRef } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { shallowEqual } from 'react-redux'
 
+import { OtpRefreshContext } from './OtpRefreshContext'
 import { generateOtpCodesByIds } from '../api/generateOtpCodesByIds'
 import { updateOtpCodes } from '../slices/otpSlice'
 import { createAlignedInterval } from '../utils/createAlignedInterval'
-
-const OtpRefreshContext = createContext(null)
 
 /**
  * Centralized OTP poller component.
@@ -75,14 +67,4 @@ export const OtpRefreshProvider = ({ children }) => {
     createElement(OtpPoller, { refreshRef }),
     children
   )
-}
-
-/**
- * Returns a function that triggers an immediate OTP codes refresh.
- * Call this after HOTP counter increments.
- * @returns {(() => void) | null}
- */
-export const useOtpRefresh = () => {
-  const ref = useContext(OtpRefreshContext)
-  return ref ? () => ref.current?.() : null
 }
