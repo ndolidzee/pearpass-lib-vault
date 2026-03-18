@@ -1,9 +1,9 @@
-import { generateUniqueId } from 'pear-apps-utils-generate-unique-id'
+import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
 
 import { createRecordFactory } from './createRecordFactory'
 import { validateAndPrepareRecord } from './validateAndPrepareRecord'
 
-jest.mock('pear-apps-utils-generate-unique-id', () => ({
+jest.mock('@tetherto/pear-apps-utils-generate-unique-id', () => ({
   generateUniqueId: jest.fn()
 }))
 

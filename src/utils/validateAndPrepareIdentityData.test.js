@@ -27,7 +27,7 @@ describe('validateAndPrepareIdentityData', () => {
     jest.clearAllMocks()
     jest.resetModules()
 
-    jest.doMock('pear-apps-utils-validator', () => ({
+    jest.doMock('@tetherto/pear-apps-utils-validator', () => ({
       Validator: {
         object: jest.fn().mockImplementation(() => ({
           validate: jest.fn(() => ({ error: 'completely new behavior' }))

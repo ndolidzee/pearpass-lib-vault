@@ -35,7 +35,7 @@ describe('validateAndPrepareRecord', () => {
     jest.clearAllMocks()
     jest.resetModules()
 
-    jest.doMock('pear-apps-utils-validator', () => ({
+    jest.doMock('@tetherto/pear-apps-utils-validator', () => ({
       Validator: {
         object: jest.fn().mockImplementation(() => ({
           validate: jest.fn(() => ({ error: 'completely new behavior' }))
@@ -233,7 +233,7 @@ describe('validateAndPrepareRecord', () => {
   })
 
   test('should throw error for invalid record', () => {
-    const { Validator } = require('pear-apps-utils-validator')
+    const { Validator } = require('@tetherto/pear-apps-utils-validator')
 
     Validator.object.mockImplementationOnce(() => ({
       validate: jest.fn(() => ({
