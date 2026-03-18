@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { generateUniqueId } from 'pear-apps-utils-generate-unique-id'
-import { Validator } from 'pear-apps-utils-validator'
+import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
 
 import { createProtectedVault } from '../api/createProtectedVault'
 import { createUnprotectedVault as createUnprotectedVaultApi } from '../api/createUnprotectedVault'

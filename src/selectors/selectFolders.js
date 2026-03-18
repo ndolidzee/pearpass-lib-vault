@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { matchPatternToValue } from 'pear-apps-utils-pattern-search'
+import { matchPatternToValue } from '@tetherto/pear-apps-utils-pattern-search'
 
 import { selectRecords } from './selectRecords'
 

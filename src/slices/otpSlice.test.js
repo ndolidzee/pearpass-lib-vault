@@ -70,9 +70,7 @@ describe('otpSlice', () => {
     })
 
     it('should default timeRemaining to null when not provided', () => {
-      store.dispatch(
-        updateOtpCodes([{ recordId: 'rec-1', code: '111222' }])
-      )
+      store.dispatch(updateOtpCodes([{ recordId: 'rec-1', code: '111222' }]))
 
       expect(store.getState().otp.codes['rec-1']).toEqual({
         code: '111222',

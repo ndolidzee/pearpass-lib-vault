@@ -13,4 +13,6 @@ export interface OtpGroupResult {
   hotpRecords: Array<unknown>
 }
 
-export declare function groupOtpRecords(records: Array<{ otpPublic?: OtpPublic }>): OtpGroupResult
+export declare function groupOtpRecords(
+  _records: Array<{ otpPublic?: OtpPublic }>
+): OtpGroupResult

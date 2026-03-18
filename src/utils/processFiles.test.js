@@ -1,8 +1,8 @@
-import { generateUniqueId } from 'pear-apps-utils-generate-unique-id'
+import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
 
 import { processFiles } from './processFiles'
 
-jest.mock('pear-apps-utils-generate-unique-id', () => ({
+jest.mock('@tetherto/pear-apps-utils-generate-unique-id', () => ({
   generateUniqueId: jest.fn()
 }))
 

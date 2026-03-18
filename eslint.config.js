@@ -8,6 +8,7 @@ export default [
         'error',
         {
           varsIgnorePattern: '^React$',
+          argsIgnorePattern: '^_',
           ignoreRestSiblings: true
         }
       ]

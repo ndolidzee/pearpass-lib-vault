@@ -1,4 +1,4 @@
-import { constantTimeHashCompare } from 'pearpass-utils-password-check'
+import { constantTimeHashCompare } from '@tetherto/pearpass-utils-password-check'
 
 import { pearpassVaultClient } from '../instances'
 import { getCurrentProtectedVaultEncryption } from './getCurrentProtectedVaultEncryption'
