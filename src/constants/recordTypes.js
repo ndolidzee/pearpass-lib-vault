@@ -1,4 +1,5 @@
 export const RECORD_TYPES = Object.freeze({
+  AUTHENTICATOR: 'authenticator',
   NOTE: 'note',
   CREDIT_CARD: 'creditCard',
   CUSTOM: 'custom',
