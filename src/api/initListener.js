@@ -9,7 +9,7 @@ import { pearpassVaultClient } from '../instances'
 export const initListener = async ({ vaultId, onUpdate }) => {
   await pearpassVaultClient.initListener({ vaultId })
 
-  pearpassVaultClient.removeAllListeners()
+  pearpassVaultClient.removeAllListeners('update')
 
   pearpassVaultClient.on('update', onUpdate)
 }
