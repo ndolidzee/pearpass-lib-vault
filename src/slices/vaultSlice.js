@@ -6,6 +6,7 @@ import { createRecord } from '../actions/createRecord'
 import { createVault } from '../actions/createVault'
 import { deleteFolder } from '../actions/deleteFolder'
 import { deleteRecords } from '../actions/deleteRecords'
+import { deleteVaultLocal } from '../actions/deleteVaultLocal'
 import { getVaultById } from '../actions/getVaultById'
 import { renameFolder } from '../actions/renameFolder'
 import { resetState } from '../actions/resetState'
@@ -203,6 +204,13 @@ export const vaultSlice = createSlice({
         state.isLoading = false
         state.error = action.error
       })
+
+    builder.addCase(deleteVaultLocal.fulfilled, (state, action) => {
+      if (state.data?.id === action.payload.vaultId) {
+        state.data = initialState.data
+        state.isInitialized = initialState.isInitialized
+      }
+    })
 
     builder.addCase(resetState.fulfilled, (state) => {
       state.data = initialState.data

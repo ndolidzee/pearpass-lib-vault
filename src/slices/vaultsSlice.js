@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 import { createVault } from '../actions/createVault'
+import { deleteVaultLocal } from '../actions/deleteVaultLocal'
 import { getVaults } from '../actions/getVaults'
 import { initializeVaults } from '../actions/initializeVaults'
 import { resetState } from '../actions/resetState'
@@ -57,6 +58,10 @@ export const vaultsSlice = createSlice({
 
     builder.addCase(createVault.fulfilled, (state, action) => {
       state.data.push(action.payload)
+    })
+
+    builder.addCase(deleteVaultLocal.fulfilled, (state, action) => {
+      state.data = action.payload.remainingVaults
     })
 
     builder.addCase(resetState.fulfilled, (state) => {
