@@ -18,9 +18,6 @@ outputs:
   allowed:
     description: "true when the workflow is authorized to proceed"
     value: ${{ steps.check.outputs.allowed }}
-  has_write:
-    description: "1 when the triggering actor has write-or-higher repo permission"
-    value: ${{ steps.perm.outputs.has-permission }}
 
 runs:
   using: composite
