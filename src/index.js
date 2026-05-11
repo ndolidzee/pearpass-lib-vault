@@ -29,6 +29,7 @@ export { getMasterEncryption } from './api/getMasterEncryption.js'
 export { getDefaultFavicon } from './api/getDefaultFavicon.js'
 export { encryptExportData } from './api/encryptExportData.js'
 export { decryptExportData } from './api/decryptExportData.js'
+export { decryptImportData } from './api/decryptImportData.js'
 export { generateOtpCodesByIds } from './api/generateOtpCodesByIds.js'
 export { generateHotpNext } from './api/generateHotpNext.js'
 
