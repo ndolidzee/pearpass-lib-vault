@@ -19,14 +19,15 @@ export const queueAction = async (
     throw new Error('queueAction: targetDeviceId, type and actor are required')
   }
 
-  const timestamp = String(Date.now()).padStart(13, '0')
+  const now = Date.now()
+  const timestamp = String(now)
   const actionId = generateUniqueId()
   const key = `actions/queue/${targetDeviceId}/${timestamp}_${actionId}`
 
   const body = {
     type,
     actor,
-    createdAt: new Date().toISOString()
+    createdAt: new Date(now).toISOString()
   }
   if (payload !== undefined) body.payload = payload
 

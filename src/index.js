@@ -22,6 +22,7 @@ export {
   setPearpassVaultClient,
   setCurrentDeviceName,
   getCurrentDeviceName,
+  clearCurrentDeviceName,
   setStoragePath
 } from './instances'
 

@@ -1,15 +1,14 @@
 import { ACTIONS } from '../actions'
 import { getMyDeviceId } from '../utils/getMyDeviceId'
 import { pearpassVaultClient } from '../instances'
+import { logger } from '../utils/logger'
 
 /**
  * @returns {Promise<void>}
  */
 export const processPendingActions = async () => {
   const myId = await getMyDeviceId()
-  if (!myId) {
-    throw new Error('No device id resolved for processing pending actions')
-  }
+  if (!myId) return
 
   const entries =
     (await pearpassVaultClient.activeVaultFind({
@@ -24,8 +23,8 @@ export const processPendingActions = async () => {
     try {
       await handler.execute(entry.value)
       await pearpassVaultClient.activeVaultRemove(entry.key)
-    } catch {
-      throw new Error('Failed to process pending action')
+    } catch (err) {
+      logger.error('Failed to process pending action', { type: entry?.value?.type, err })
     }
   }
 }

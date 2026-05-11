@@ -9,16 +9,14 @@ import { fileSchema } from '../schemas/fileSchema'
 export const customSchema = Validator.object({
   title: Validator.string().required(),
   customFields: Validator.array().items(customFieldSchema),
-  attachments: Validator.array().items(fileSchema),
-  note: Validator.string()
+  attachments: Validator.array().items(fileSchema)
 })
 
 export const validateAndPrepareCustomData = (custom) => {
   const customData = {
     title: custom.title,
     customFields: validateAndPrepareCustomFields(custom.customFields),
-    attachments: custom.attachments,
-    note: custom.note
+    attachments: custom.attachments
   }
 
   const errors = customSchema.validate(customData)

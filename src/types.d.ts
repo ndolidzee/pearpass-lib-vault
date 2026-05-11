@@ -16,3 +16,39 @@ export interface OtpGroupResult {
 export declare function groupOtpRecords(
   _records: Array<{ otpPublic?: OtpPublic }>
 ): OtpGroupResult
+
+export declare const ACTION_TYPES: Record<string, string>
+
+export declare const ACTIONS: Record<
+  string,
+  { execute: (entry: unknown) => Promise<void> }
+>
+
+export declare function queueAction(
+  targetDeviceId: string,
+  action: { type: string; actor: string; payload?: unknown }
+): Promise<{ timestamp: string; actionId: string; key: string }>
+
+export declare function broadcastAction(action: {
+  type: string
+  payload?: unknown
+}): Promise<
+  Array<{
+    targetDeviceId: string
+    timestamp: string
+    actionId: string
+    key: string
+  }>
+>
+
+export declare function processPendingActions(): Promise<void>
+
+export declare function runActionScan(): Promise<void>
+
+export declare function getMyDeviceId(): Promise<string | null>
+
+export declare function setCurrentDeviceName(name: string): void
+
+export declare function getCurrentDeviceName(): string | null
+
+export declare function clearCurrentDeviceName(): void

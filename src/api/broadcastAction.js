@@ -1,6 +1,7 @@
 import { listDevices } from './listDevices'
 import { queueAction } from './queueAction'
 import { getMyDeviceId } from '../utils/getMyDeviceId'
+import { ACTION_TYPES } from '../actions'
 
 /**
  * @param {{
@@ -19,11 +20,13 @@ export const broadcastAction = async ({ type, payload } = {}) => {
     throw new Error('broadcastAction: type is required')
   }
 
+  if (!ACTION_TYPES[type]) {
+    throw new Error('broadcastAction: unknown action type: ' + type)
+  }
+
   const myDeviceId = await getMyDeviceId()
   if (!myDeviceId) {
-    throw new Error(
-      'broadcastAction: cannot resolve own device id (no writerKey match)'
-    )
+    throw new Error('broadcastAction: cannot resolve own device id')
   }
 
   const devices = (await listDevices()) ?? []
