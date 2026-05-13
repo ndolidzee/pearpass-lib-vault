@@ -43,16 +43,16 @@ describe('processPendingActions', () => {
 
   it('dispatches each entry to the action handler and removes it', async () => {
     const execute = jest.fn().mockResolvedValue()
-    mockExecute['smoke-test'] = { execute }
+    mockExecute['ALERT'] = { execute }
 
     pearpassVaultClient.activeVaultFind.mockResolvedValue([
       {
         key: 'actions/queue/BBB/1736000000001_x1',
         value: {
-          type: 'smoke-test',
+          type: 'ALERT',
           actor: 'AAA',
           createdAt: 't1',
-          payload: { description: 'hello' }
+          payload: { message: 'hello' }
         }
       }
     ])
@@ -61,9 +61,9 @@ describe('processPendingActions', () => {
 
     expect(execute).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'smoke-test',
+        type: 'ALERT',
         actor: 'AAA',
-        payload: { description: 'hello' }
+        payload: { message: 'hello' }
       })
     )
     expect(pearpassVaultClient.activeVaultRemove).toHaveBeenCalledWith(
