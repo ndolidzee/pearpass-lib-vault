@@ -158,11 +158,24 @@ export const vaultSlice = createSlice({
       .addCase(addDevice.fulfilled, (state, action) => {
         state.isDeviceLoading = false
 
-        const currentDevices = state.data?.devices ?? []
+        const newDevice = action?.payload
+        if (!newDevice) return
 
-        state.data.devices = action?.payload
-          ? [...currentDevices, action.payload]
-          : currentDevices
+        const currentDevices = state.data?.devices ?? []
+        const existingIndex = currentDevices.findIndex(
+          (device) => device.id === newDevice.id
+        )
+
+        // addDevice self-heals stale entries by reusing the existing id, so
+        // we replace-by-id rather than append. Pure adds (no existing match)
+        // still append as before.
+        if (existingIndex === -1) {
+          state.data.devices = [...currentDevices, newDevice]
+        } else {
+          const updated = [...currentDevices]
+          updated[existingIndex] = newDevice
+          state.data.devices = updated
+        }
       })
       .addCase(addDevice.rejected, (state, action) => {
         logger.error(`Action addDevice error:`, JSON.stringify(action.error))
