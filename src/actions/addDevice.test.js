@@ -33,7 +33,9 @@ describe('addDevice', () => {
     global.Date.now = jest.fn().mockReturnValue(mockDate)
 
     generateUniqueId.mockReturnValue(mockDeviceId)
-    setPearpassVaultClient(pearpassVaultClient, { currentDeviceName: mockDeviceName })
+    setPearpassVaultClient(pearpassVaultClient, {
+      currentDeviceName: mockDeviceName
+    })
     pearpassVaultClient.activeVaultGetWriterKey.mockResolvedValue(mockWriterKey)
 
     dispatch = jest.fn()

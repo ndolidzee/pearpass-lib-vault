@@ -24,7 +24,10 @@ describe('deleteVaultLocal action', () => {
 
     expect(deleteVaultLocalApi).toHaveBeenCalledWith('v1')
     expect(result.type).toBe(deleteVaultLocal.fulfilled.type)
-    expect(result.payload).toEqual({ vaultId: 'v1', remainingVaults: remaining })
+    expect(result.payload).toEqual({
+      vaultId: 'v1',
+      remainingVaults: remaining
+    })
   })
 
   it('rejects when the api throws', async () => {

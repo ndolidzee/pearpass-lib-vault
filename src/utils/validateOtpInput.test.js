@@ -26,9 +26,7 @@ describe('validateOtpInput', () => {
     })
 
     it('accepts a valid 32-char Base32 secret', () => {
-      expect(
-        validateOtpInput('JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP')
-      ).toBeNull()
+      expect(validateOtpInput('JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP')).toBeNull()
     })
 
     it('accepts a Base32 secret with trailing padding', () => {
@@ -77,16 +75,14 @@ describe('validateOtpInput', () => {
 
     it('rejects URIs with an unsupported type', () => {
       expect(
-        validateOtpInput(
-          'otpauth://yotp/Example?secret=JBSWY3DPEHPK3PXP'
-        )
+        validateOtpInput('otpauth://yotp/Example?secret=JBSWY3DPEHPK3PXP')
       ).toBe('Unsupported OTP type')
     })
 
     it('rejects URIs missing the secret param', () => {
-      expect(
-        validateOtpInput('otpauth://totp/Example?issuer=Example')
-      ).toBe('OTP URI is missing secret')
+      expect(validateOtpInput('otpauth://totp/Example?issuer=Example')).toBe(
+        'OTP URI is missing secret'
+      )
     })
 
     it('rejects URIs whose secret is not valid Base32', () => {

@@ -9,8 +9,7 @@ const MIN_BASE32_LENGTH = 16
  * @param {string} secret
  * @returns {string}
  */
-const normalizeSecret = (secret) =>
-  secret.replace(/[\s-]/g, '').toUpperCase()
+const normalizeSecret = (secret) => secret.replace(/[\s-]/g, '').toUpperCase()
 
 /**
  * @param {string} secret - Already normalized.

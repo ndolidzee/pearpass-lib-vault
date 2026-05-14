@@ -1,8 +1,8 @@
 import { listDevices } from './listDevices'
 import { queueAction } from './queueAction'
+import { ACTION_TYPES } from '../actions'
 import { getMyDeviceId } from '../utils/getMyDeviceId'
 import { logger } from '../utils/logger'
-import { ACTION_TYPES } from '../actions'
 
 /**
  * @param {{

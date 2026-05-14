@@ -1,12 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
 import { addDevice as addDeviceApi } from '../api/addDevice'
+import { getCurrentDeviceName, pearpassVaultClient } from '../instances'
 import { addDeviceFactory } from '../utils/addDeviceFactory'
 import { logger } from '../utils/logger'
-import {
-  getCurrentDeviceName,
-  pearpassVaultClient
-} from '../instances'
 
 export const addDevice = createAsyncThunk(
   'vault/addDevice',

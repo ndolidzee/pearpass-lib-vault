@@ -1,20 +1,23 @@
 export let pearpassVaultClient
 
-let _currentDeviceName = null
+let currentDeviceNameValue = null
 
 /**
  * @param {object} instance
  * @param {{ currentDeviceName: string }} options
  */
-export const setPearpassVaultClient = (instance, { currentDeviceName } = {}) => {
+export const setPearpassVaultClient = (
+  instance,
+  { currentDeviceName } = {}
+) => {
   pearpassVaultClient = instance
-  _currentDeviceName = currentDeviceName ?? null
+  currentDeviceNameValue = currentDeviceName ?? null
 }
 
 /**
  * @returns {string | null}
  */
-export const getCurrentDeviceName = () => _currentDeviceName
+export const getCurrentDeviceName = () => currentDeviceNameValue
 
 /**
  * @param {string} path

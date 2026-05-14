@@ -1,6 +1,6 @@
 import { ACTIONS } from '../actions'
-import { getMyDeviceId } from '../utils/getMyDeviceId'
 import { pearpassVaultClient } from '../instances'
+import { getMyDeviceId } from '../utils/getMyDeviceId'
 import { logger } from '../utils/logger'
 
 /**

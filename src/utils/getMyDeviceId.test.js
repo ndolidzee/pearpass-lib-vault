@@ -19,7 +19,9 @@ describe('getMyDeviceId', () => {
     })
 
     it('writerKey match wins even if a different name-only record matches the singleton', async () => {
-      setPearpassVaultClient(pearpassVaultClient, { currentDeviceName: 'ios 18.0' })
+      setPearpassVaultClient(pearpassVaultClient, {
+        currentDeviceName: 'ios 18.0'
+      })
       pearpassVaultClient.activeVaultGetWriterKey.mockResolvedValue('w-bbb')
       pearpassVaultClient.activeVaultList.mockResolvedValue([
         { id: 'OLD', name: 'ios 18.0' },
@@ -31,7 +33,9 @@ describe('getMyDeviceId', () => {
 
   describe('legacy fallback (name match via singleton)', () => {
     it('returns the legacy record id when writerKey does not match and singleton name does', async () => {
-      setPearpassVaultClient(pearpassVaultClient, { currentDeviceName: 'ios 18.0' })
+      setPearpassVaultClient(pearpassVaultClient, {
+        currentDeviceName: 'ios 18.0'
+      })
       pearpassVaultClient.activeVaultGetWriterKey.mockResolvedValue('w-bbb')
       pearpassVaultClient.activeVaultList.mockResolvedValue([
         { id: 'OLD', name: 'ios 18.0' }
@@ -40,7 +44,9 @@ describe('getMyDeviceId', () => {
     })
 
     it('only matches legacy records (no writerKey on record)', async () => {
-      setPearpassVaultClient(pearpassVaultClient, { currentDeviceName: 'ios 18.0' })
+      setPearpassVaultClient(pearpassVaultClient, {
+        currentDeviceName: 'ios 18.0'
+      })
       pearpassVaultClient.activeVaultGetWriterKey.mockResolvedValue('w-bbb')
       pearpassVaultClient.activeVaultList.mockResolvedValue([
         { id: 'OTHER', name: 'ios 18.0', writerKey: 'w-other' }

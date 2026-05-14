@@ -107,9 +107,7 @@ export const matchLoginRecords = (parsedOtp, loginRecords) => {
     if (b.reasons.length !== a.reasons.length) {
       return b.reasons.length - a.reasons.length
     }
-    return String(a.record?.id ?? '').localeCompare(
-      String(b.record?.id ?? '')
-    )
+    return String(a.record?.id ?? '').localeCompare(String(b.record?.id ?? ''))
   })
 
   return matches

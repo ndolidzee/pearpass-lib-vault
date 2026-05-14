@@ -19,10 +19,9 @@ describe('matchLoginRecords', () => {
 
   it('returns [] when parsedOtp has neither issuer nor label (raw secret case)', () => {
     expect(
-      matchLoginRecords(
-        { secret: 'JBSWY3DPEHPK3PXP', type: 'TOTP' },
-        [record('a', { title: 'GitHub', websites: ['github.com'] })]
-      )
+      matchLoginRecords({ secret: 'JBSWY3DPEHPK3PXP', type: 'TOTP' }, [
+        record('a', { title: 'GitHub', websites: ['github.com'] })
+      ])
     ).toEqual([])
   })
 
@@ -81,10 +80,7 @@ describe('matchLoginRecords', () => {
       record('a', { title: 'Twitter', username: 'jane@example.com' }),
       record('b', { title: 'Twitter alt', username: 'someone-else' })
     ]
-    const result = matchLoginRecords(
-      { label: 'Jane@Example.com' },
-      recs
-    )
+    const result = matchLoginRecords({ label: 'Jane@Example.com' }, recs)
     expect(result.map((m) => m.record.id)).toEqual(['a'])
     expect(result[0].reasons).toEqual(['label-username'])
   })
@@ -103,7 +99,10 @@ describe('matchLoginRecords', () => {
 
   it('ranks multi-signal matches above single-signal matches', () => {
     const recs = [
-      record('weak', { title: 'GitHub - work', websites: ['https://github.com'] }),
+      record('weak', {
+        title: 'GitHub - work',
+        websites: ['https://github.com']
+      }),
       record('strong', {
         title: 'GitHub - personal',
         username: 'jane@example.com',
@@ -137,17 +136,13 @@ describe('matchLoginRecords', () => {
   })
 
   it('handles missing data fields without throwing', () => {
-    const recs = [
-      record('a', {}),
-      record('b', undefined),
-      { id: 'c' }
-    ]
+    const recs = [record('a', {}), record('b', undefined), { id: 'c' }]
     expect(() =>
       matchLoginRecords({ issuer: 'GitHub', label: 'jane' }, recs)
     ).not.toThrow()
-    expect(matchLoginRecords({ issuer: 'GitHub', label: 'jane' }, recs)).toEqual(
-      []
-    )
+    expect(
+      matchLoginRecords({ issuer: 'GitHub', label: 'jane' }, recs)
+    ).toEqual([])
   })
 
   it('ignores empty/whitespace issuer and label', () => {

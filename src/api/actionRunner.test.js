@@ -25,7 +25,10 @@ describe('actionRunner', () => {
     let resolveFirst
     mockProcessPendingActions
       .mockImplementationOnce(
-        () => new Promise((resolve) => { resolveFirst = resolve })
+        () =>
+          new Promise((resolve) => {
+            resolveFirst = resolve
+          })
       )
       .mockResolvedValue(undefined)
 

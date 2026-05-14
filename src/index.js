@@ -18,10 +18,7 @@ export { useBlindMirrors } from './hooks/useBlindMirrors'
 export { VaultProvider } from './store'
 
 export { closeAllInstances } from './api/closeAllInstances'
-export {
-  setPearpassVaultClient,
-  setStoragePath
-} from './instances'
+export { setPearpassVaultClient, setStoragePath } from './instances'
 
 export { queueAction } from './api/queueAction'
 export { broadcastAction } from './api/broadcastAction'
