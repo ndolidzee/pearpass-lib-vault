@@ -1,14 +1,17 @@
 import { ACTION_TYPES } from '../actions'
-import { pearpassVaultClient } from '../instances'
 import { listDevices } from './listDevices'
 import { outboxAppend } from './outbox'
 import { getMyDeviceId } from '../utils/getMyDeviceId'
 import { logger } from '../utils/logger'
 
 /**
+ * Persist one outbox envelope per peer and kick the action runner. The actual
+ * swarm delivery happens asynchronously in processOutbox, so callers never
+ * block on transport.
+ *
  * @param {{ type: string, payload?: any }} action
  * @returns {Promise<{
- *   results: Array<{ targetDeviceId: string, channel: 'direct' | 'outbox' }>,
+ *   results: Array<{ targetDeviceId: string, channel: 'outbox' }>,
  *   failures: Array<{ targetDeviceId: string, error: Error }>
  * }>}
  */
@@ -38,19 +41,21 @@ export const broadcastAction = async ({ type, payload } = {}) => {
 
   const results = []
   const failures = []
-  let queuedAny = false
 
   for (const target of others) {
     try {
-      const channel = await deliverToTarget(target, envelopeBase)
-      if (channel === 'outbox') queuedAny = true
-      results.push({ targetDeviceId: target.id, channel })
+      await outboxAppend({
+        targetDeviceId: target.id,
+        targetTopic: target.masterTopic ?? null,
+        envelopeBase
+      })
+      results.push({ targetDeviceId: target.id, channel: 'outbox' })
     } catch (error) {
       failures.push({ targetDeviceId: target.id, error })
     }
   }
 
-  if (queuedAny) {
+  if (results.length) {
     import('./actionRunner')
       .then(({ runActionScan }) => runActionScan())
       .catch(() => {})
@@ -61,37 +66,6 @@ export const broadcastAction = async ({ type, payload } = {}) => {
   }
 
   return { results, failures }
-}
-
-const deliverToTarget = async (target, envelopeBase) => {
-  if (target.masterTopic && supportsPersonalSwarm()) {
-    const send = await tryDirectSend(target.masterTopic, envelopeBase)
-    if (send.ok) return 'direct'
-  }
-
-  await outboxAppend({
-    targetDeviceId: target.id,
-    targetTopic: target.masterTopic ?? null,
-    envelopeBase
-  })
-  return 'outbox'
-}
-
-const supportsPersonalSwarm = () =>
-  typeof pearpassVaultClient?.personalSwarmSend === 'function'
-
-const tryDirectSend = async (targetTopic, envelopeBase) => {
-  try {
-    const envelope = encodeEnvelope(envelopeBase)
-    const result = await pearpassVaultClient.personalSwarmSend(
-      targetTopic,
-      envelope
-    )
-    return result ?? { ok: false, reason: 'no-result' }
-  } catch (err) {
-    logger.error('broadcastAction: direct send threw', { err })
-    return { ok: false, reason: 'threw' }
-  }
 }
 
 export const encodeEnvelope = (envelopeBase) => {

@@ -43,11 +43,19 @@ export const processOutbox = async () => {
     return { drained: 0, retried: 0, dropped: 0 }
   }
 
-  const entries =
-    (await pearpassVaultClient.vaultsFind({
-      gte: { key: OUTBOX_PREFIX },
-      lt: { key: nextPrefix(OUTBOX_PREFIX) }
-    })) ?? []
+  let entries
+  try {
+    entries =
+      (await pearpassVaultClient.vaultsFind({
+        gte: { key: OUTBOX_PREFIX },
+        lt: { key: nextPrefix(OUTBOX_PREFIX) }
+      })) ?? []
+  } catch (err) {
+    if (/not initialised/i.test(err?.message ?? '')) {
+      return { drained: 0, retried: 0, dropped: 0 }
+    }
+    throw err
+  }
 
   const now = Date.now()
   let drained = 0

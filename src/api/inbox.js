@@ -49,11 +49,19 @@ export const processInbox = async () => {
     return { processed: 0, skipped: 0, failed: 0 }
   }
 
-  const entries =
-    (await pearpassVaultClient.vaultsFind({
-      gte: { key: INBOX_PREFIX },
-      lt: { key: nextPrefix(INBOX_PREFIX) }
-    })) ?? []
+  let entries
+  try {
+    entries =
+      (await pearpassVaultClient.vaultsFind({
+        gte: { key: INBOX_PREFIX },
+        lt: { key: nextPrefix(INBOX_PREFIX) }
+      })) ?? []
+  } catch (err) {
+    if (/not initialised/i.test(err?.message ?? '')) {
+      return { processed: 0, skipped: 0, failed: 0 }
+    }
+    throw err
+  }
 
   let processed = 0
   let skipped = 0
