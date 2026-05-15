@@ -17,23 +17,15 @@ export const addDevice = createAsyncThunk(
     const writerKey = await pearpassVaultClient.activeVaultGetWriterKey()
 
     const existingDevice = existingDevices.find(
-      (device) => device.name === deviceName
+      (device) => device.writerKey === writerKey
     )
 
-    if (existingDevice && existingDevice.writerKey === writerKey) {
+    if (existingDevice) {
       logger.log('Device already added to vault')
       return existingDevice
     }
 
-    // Either no entry, or the existing entry has a stale writerKey (typically
-    // a reinstall on the same device — the local Corestore keypair was
-    // regenerated, so autopass now writes under a new writerKey). Reuse the
-    // existing id when present so we overwrite device/<id> in place rather
-    // than leaving a duplicate-by-name entry that getMyDeviceId can't match
-    // by writerKey.
-    const device = existingDevice
-      ? { ...existingDevice, writerKey, createdAt: Date.now() }
-      : addDeviceFactory(deviceName, vaultId, writerKey)
+    const device = addDeviceFactory(deviceName, vaultId, writerKey)
 
     await addDeviceApi(device)
 
