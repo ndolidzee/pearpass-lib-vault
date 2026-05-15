@@ -15,17 +15,9 @@ const INBOX_PREFIX = 'actions/inbox/'
 export const acceptInboundEnvelope = async ({ envelope, peerInfo } = {}) => {
   if (!envelope) return
 
-  const decoded = decodeEnvelope(envelope)
+  const decoded = await decodeEnvelope(envelope, { verify: true })
   if (!decoded || !decoded.type) {
-    logger.error('inbox: dropped malformed envelope', { peerInfo })
-    return
-  }
-
-  if (!(await isActorTrusted(decoded.actor))) {
-    logger.error('inbox: dropped envelope from untrusted actor', {
-      actor: decoded.actor,
-      type: decoded.type
-    })
+    logger.error('inbox: dropped malformed or unsigned envelope', { peerInfo })
     return
   }
 
@@ -94,16 +86,16 @@ const nextPrefix = (prefix) => {
   return prefix.slice(0, -1) + String.fromCharCode(last + 1)
 }
 
-const isActorTrusted = async (actor) => {
-  if (!actor) return false
+export const lookupPeerMasterTopic = async (actor) => {
+  if (!actor) return null
   try {
     const peer = await pearpassVaultClient?.vaultsGet?.(`peer/${actor}`)
-    if (peer) return true
+    if (peer?.masterTopic) return peer.masterTopic
     const myDevices = (await listDevices()) ?? []
-    return myDevices.some((d) => d?.id === actor)
+    return myDevices.find((d) => d?.id === actor)?.masterTopic ?? null
   } catch (err) {
-    logger.error('inbox: failed to list devices for trust check', { err })
-    return false
+    logger.error('inbox: lookup peer masterTopic failed', { err })
+    return null
   }
 }
 
@@ -115,6 +107,8 @@ export const registerPeer = async (device) => {
     await pearpassVaultClient?.vaultsAdd?.(`${PEER_PREFIX}${device.id}`, {
       id: device.id,
       name: device.name ?? null,
+      writerKey: device.writerKey ?? null,
+      masterTopic: device.masterTopic ?? null,
       lastSeenAt: Date.now()
     })
   } catch (err) {

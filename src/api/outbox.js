@@ -1,7 +1,8 @@
 import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
 
 import { pearpassVaultClient } from '../instances'
-import { encodeEnvelope, decodeEnvelope } from './broadcastAction'
+import { encodeEnvelope } from './broadcastAction'
+import { logger } from '../utils/logger'
 
 const OUTBOX_PREFIX = 'actions/outbox/'
 const FAST_PHASE_MS = 7 * 24 * 60 * 60 * 1000
@@ -27,7 +28,7 @@ export const outboxAppend = async ({
     id,
     targetDeviceId,
     targetTopic: targetTopic ?? null,
-    envelope: encodeEnvelope(envelopeBase),
+    envelopeBase,
     firstTry: Date.now(),
     attempts: 0,
     nextRetry: Date.now()
@@ -82,8 +83,18 @@ export const processOutbox = async () => {
       continue
     }
 
+    let wrapperHex
+    try {
+      wrapperHex = await encodeEnvelope(record.envelopeBase)
+    } catch (err) {
+      logger.error('outbox: sign failed', { err })
+      await bumpEntry(entry.key, record, now)
+      retried += 1
+      continue
+    }
+
     const result = await pearpassVaultClient
-      .personalSwarmSend(record.targetTopic, record.envelope)
+      .personalSwarmSend(record.targetTopic, wrapperHex)
       .catch((err) => ({ ok: false, reason: `threw:${err?.message ?? err}` }))
 
     if (result?.ok) {
@@ -134,7 +145,7 @@ export const listOutbox = async () => {
   return entries.map((entry) => ({
     key: entry.key,
     record: entry.value,
-    envelope: decodeEnvelope(entry.value?.envelope ?? '')
+    envelope: entry.value?.envelopeBase ?? null
   }))
 }
 

@@ -1,4 +1,5 @@
 import { ACTION_TYPES } from '../actions'
+import { pearpassVaultClient } from '../instances'
 import { listDevices } from './listDevices'
 import { outboxAppend } from './outbox'
 import { getMyDeviceId } from '../utils/getMyDeviceId'
@@ -68,15 +69,61 @@ export const broadcastAction = async ({ type, payload } = {}) => {
   return { results, failures }
 }
 
-export const encodeEnvelope = (envelopeBase) => {
+/**
+ * Sign and wrap an envelope base for transport. The wrapper is hex JSON:
+ *   { envelope: <hex of body JSON>, signature: <hex of ed25519 detached sig> }
+ * The body bytes are hex-encoded so receiver verifies against the exact bytes
+ * the sender hashed (no JSON canonicalisation surprises).
+ *
+ * @param {Object} envelopeBase
+ * @returns {Promise<string>} hex of wrapper JSON
+ */
+export const encodeEnvelope = async (envelopeBase) => {
   const json = JSON.stringify(envelopeBase)
-  return Buffer.from(json, 'utf8').toString('hex')
+  const bodyHex = Buffer.from(json, 'utf8').toString('hex')
+  const signature = await pearpassVaultClient.signMessage(bodyHex)
+  const wrapperJson = JSON.stringify({ envelope: bodyHex, signature })
+  return Buffer.from(wrapperJson, 'utf8').toString('hex')
 }
 
-export const decodeEnvelope = (envelopeHex) => {
+/**
+ * @param {string} wrapperHex
+ * @param {{ verify?: boolean }} [opts] - when true, verify the signature
+ *   against the actor's masterTopic from the peer registry. Default true.
+ * @returns {Promise<Object | null>}
+ */
+export const decodeEnvelope = async (wrapperHex, opts = { verify: true }) => {
   try {
-    const json = Buffer.from(envelopeHex, 'hex').toString('utf8')
-    return JSON.parse(json)
+    const wrapperJson = Buffer.from(wrapperHex, 'hex').toString('utf8')
+    const wrapper = JSON.parse(wrapperJson)
+    const bodyHex = wrapper?.envelope
+    const signatureHex = wrapper?.signature
+    if (!bodyHex || !signatureHex) return null
+
+    const bodyJson = Buffer.from(bodyHex, 'hex').toString('utf8')
+    const body = JSON.parse(bodyJson)
+
+    if (opts?.verify !== false) {
+      const { lookupPeerMasterTopic } = await import('./inbox')
+      const publicKey = await lookupPeerMasterTopic(body?.actor)
+      if (!publicKey) {
+        logger.error('broadcastAction: actor unknown', { actor: body?.actor })
+        return null
+      }
+      const ok = await pearpassVaultClient.verifySignature(
+        bodyHex,
+        signatureHex,
+        publicKey
+      )
+      if (!ok) {
+        logger.error('broadcastAction: signature invalid', {
+          actor: body?.actor
+        })
+        return null
+      }
+    }
+
+    return body
   } catch (err) {
     logger.error('broadcastAction: failed to decode envelope', { err })
     return null
