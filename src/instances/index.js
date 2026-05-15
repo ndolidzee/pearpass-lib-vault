@@ -2,6 +2,7 @@ export let pearpassVaultClient
 
 let currentDeviceNameValue = null
 let envelopeSubscription = null
+let newListenerSubscription = null
 
 /**
  * @param {object} instance
@@ -12,11 +13,13 @@ export const setPearpassVaultClient = (
   { currentDeviceName } = {}
 ) => {
   detachEnvelopeListener()
+  detachNewListenerHook()
 
   pearpassVaultClient = instance
   currentDeviceNameValue = currentDeviceName ?? null
 
   attachEnvelopeListener()
+  attachNewListenerHook()
 }
 
 /**
@@ -52,4 +55,27 @@ const detachEnvelopeListener = () => {
   if (!pearpassVaultClient?.off || !envelopeSubscription) return
   pearpassVaultClient.off('personal-swarm-envelope', envelopeSubscription)
   envelopeSubscription = null
+}
+
+// Re-run processInbox when a consumer subscribes to an event our handlers
+// emit, so envelopes that arrived before the listener mounted can still be
+// delivered.
+const attachNewListenerHook = () => {
+  if (!pearpassVaultClient?.on) return
+  if (newListenerSubscription) return
+
+  newListenerSubscription = async (event) => {
+    if (event !== 'vault-access-revoked') return
+    try {
+      const { runActionScan } = await import('../api/actionRunner.js')
+      runActionScan().catch(() => {})
+    } catch {}
+  }
+  pearpassVaultClient.on('newListener', newListenerSubscription)
+}
+
+const detachNewListenerHook = () => {
+  if (!pearpassVaultClient?.off || !newListenerSubscription) return
+  pearpassVaultClient.off('newListener', newListenerSubscription)
+  newListenerSubscription = null
 }

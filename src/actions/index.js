@@ -21,6 +21,9 @@ export const ACTIONS = {
       if (!vaultId) {
         throw new Error('delete-vault action: payload.vaultId is required')
       }
+      if (pearpassVaultClient.listenerCount?.('vault-access-revoked') === 0) {
+        throw new Error('delete-vault action: no vault-access-revoked listener')
+      }
       pearpassVaultClient.emit('vault-access-revoked', {
         vaultId,
         actor: action?.actor
