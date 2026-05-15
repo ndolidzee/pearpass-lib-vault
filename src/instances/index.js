@@ -26,6 +26,13 @@ export const setPearpassVaultClient = (
 }
 
 /**
+ * @param {string | null} name
+ */
+export const setCurrentDeviceName = (name) => {
+  currentDeviceNameValue = name ?? null
+}
+
+/**
  * @returns {string | null}
  */
 export const getCurrentDeviceName = () => currentDeviceNameValue
