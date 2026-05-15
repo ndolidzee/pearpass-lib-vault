@@ -91,12 +91,16 @@ export const processOutbox = async () => {
   return { drained, retried, dropped }
 }
 
+const FIRST_RETRY_MS = 3_000
+const FIRST_RETRY_JITTER_MS = 2_000
+
 const bumpEntry = async (key, record, now) => {
-  const next = {
-    ...record,
-    attempts: (record.attempts ?? 0) + 1,
-    nextRetry: now + backoffMs(record.attempts ?? 0)
-  }
+  const attempts = (record.attempts ?? 0) + 1
+  const nextRetry =
+    attempts === 1
+      ? now + FIRST_RETRY_MS + Math.floor(Math.random() * FIRST_RETRY_JITTER_MS)
+      : now + backoffMs(attempts - 1)
+  const next = { ...record, attempts, nextRetry }
   await pearpassVaultClient.vaultsAdd(key, next)
 }
 

@@ -2,14 +2,13 @@ import { ACTION_TYPES } from '../actions'
 import { pearpassVaultClient } from '../instances'
 import { listDevices } from './listDevices'
 import { outboxAppend } from './outbox'
-import { queueAction } from './queueAction'
 import { getMyDeviceId } from '../utils/getMyDeviceId'
 import { logger } from '../utils/logger'
 
 /**
  * @param {{ type: string, payload?: any }} action
  * @returns {Promise<{
- *   results: Array<{ targetDeviceId: string, channel: 'direct' | 'outbox' | 'legacy' }>,
+ *   results: Array<{ targetDeviceId: string, channel: 'direct' | 'outbox' }>,
  *   failures: Array<{ targetDeviceId: string, error: Error }>
  * }>}
  */
@@ -39,14 +38,22 @@ export const broadcastAction = async ({ type, payload } = {}) => {
 
   const results = []
   const failures = []
+  let queuedAny = false
 
   for (const target of others) {
     try {
       const channel = await deliverToTarget(target, envelopeBase)
+      if (channel === 'outbox') queuedAny = true
       results.push({ targetDeviceId: target.id, channel })
     } catch (error) {
       failures.push({ targetDeviceId: target.id, error })
     }
+  }
+
+  if (queuedAny) {
+    import('./actionRunner')
+      .then(({ runActionScan }) => runActionScan())
+      .catch(() => {})
   }
 
   if (failures.length) {
@@ -60,23 +67,14 @@ const deliverToTarget = async (target, envelopeBase) => {
   if (target.masterTopic && supportsPersonalSwarm()) {
     const send = await tryDirectSend(target.masterTopic, envelopeBase)
     if (send.ok) return 'direct'
-
-    await outboxAppend({
-      targetDeviceId: target.id,
-      targetTopic: target.masterTopic,
-      envelopeBase
-    })
-    return 'outbox'
   }
 
-  // Legacy in-vault queue: only reached for targets that haven't published
-  // a masterTopic yet. Self-resolves once they upgrade and addDevice heals.
-  await queueAction(target.id, {
-    type: envelopeBase.type,
-    payload: envelopeBase.payload,
-    actor: envelopeBase.actor
+  await outboxAppend({
+    targetDeviceId: target.id,
+    targetTopic: target.masterTopic ?? null,
+    envelopeBase
   })
-  return 'legacy'
+  return 'outbox'
 }
 
 const supportsPersonalSwarm = () =>
