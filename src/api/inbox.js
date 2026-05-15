@@ -21,7 +21,7 @@ export const acceptInboundEnvelope = async ({ envelope, peerInfo } = {}) => {
     return
   }
 
-  if (!(await isActorTrusted(decoded))) {
+  if (!(await isActorTrusted(decoded.actor))) {
     logger.error('inbox: dropped envelope from untrusted actor', {
       actor: decoded.actor,
       type: decoded.type
@@ -86,22 +86,11 @@ const nextPrefix = (prefix) => {
   return prefix.slice(0, -1) + String.fromCharCode(last + 1)
 }
 
-const isActorTrusted = async (decoded) => {
-  const actor = decoded?.actor
+const isActorTrusted = async (actor) => {
   if (!actor) return false
   try {
     const peer = await pearpassVaultClient?.vaultsGet?.(`peer/${actor}`)
     if (peer) return true
-    const vaultId = decoded?.payload?.vaultId
-    if (vaultId) {
-      const ourVault = await pearpassVaultClient?.vaultsGet?.(
-        `vault/${vaultId}`
-      )
-      if (ourVault) {
-        await registerPeer({ id: actor })
-        return true
-      }
-    }
     const myDevices = (await listDevices()) ?? []
     return myDevices.some((d) => d?.id === actor)
   } catch (err) {
