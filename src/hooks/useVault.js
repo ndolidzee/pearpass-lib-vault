@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -63,6 +63,10 @@ export const useVault = ({ variables } = {}) => {
   const { isLoading: isVaultsLoading, data: vaultsData } =
     useSelector(selectVaults)
 
+  // vaultsData may still be null when listener callbacks are registered.
+  const vaultsDataRef = useRef(vaultsData)
+  vaultsDataRef.current = vaultsData
+
   const {
     isLoading: isVaultLoading,
     data,
@@ -79,7 +83,9 @@ export const useVault = ({ variables } = {}) => {
   // Copy peer renames into the per-device vault registry that backs useVaults.
   const syncVaultNameToRegistry = async (vault) => {
     if (!vault?.id) return
-    const localVault = (vaultsData ?? []).find((v) => v.id === vault.id)
+    const localVault = (vaultsDataRef.current ?? []).find(
+      (v) => v.id === vault.id
+    )
     if (!localVault || localVault.name === vault.name) return
     const { records, devices, ...registryVault } = vault
     try {
