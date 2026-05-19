@@ -76,6 +76,20 @@ export const useVault = ({ variables } = {}) => {
     []
   )
 
+  // Copy peer renames into the per-device vault registry that backs useVaults.
+  const syncVaultNameToRegistry = async (vault) => {
+    if (!vault?.id) return
+    const localVault = (vaultsData ?? []).find((v) => v.id === vault.id)
+    if (!localVault || localVault.name === vault.name) return
+    const { records, devices, ...registryVault } = vault
+    try {
+      await pearpassVaultClient.vaultsAdd(`vault/${vault.id}`, registryVault)
+      await dispatch(getVaults())
+    } catch (err) {
+      logger.error('vault name sync failed', { err })
+    }
+  }
+
   const fetchVault = async (vaultId, params) => {
     const { payload: vault, error } = await dispatch(
       getVaultById({ vaultId: vaultId, params })
@@ -85,29 +99,17 @@ export const useVault = ({ variables } = {}) => {
       throw new Error('Error fetching vault')
     }
 
-    // Copy peer renames into the per-device vault registry that backs useVaults.
-    if (vault?.id) {
-      const localVault = (vaultsData ?? []).find((v) => v.id === vault.id)
-      if (localVault && localVault.name !== vault.name) {
-        const { records, devices, ...registryVault } = vault
-        try {
-          await pearpassVaultClient.vaultsAdd(
-            `vault/${vault.id}`,
-            registryVault
-          )
-          await dispatch(getVaults())
-        } catch (err) {
-          logger.error('vault name sync failed', { err })
-        }
-      }
-    }
+    await syncVaultNameToRegistry(vault)
 
     await initListener({
       vaultId: vaultId,
       onUpdate: async () => {
         const current = await getCurrentVault()
         if (current) {
-          dispatch(getVaultById({ vaultId: current.id }))
+          const { payload: refreshed } = await dispatch(
+            getVaultById({ vaultId: current.id })
+          )
+          await syncVaultNameToRegistry(refreshed)
         }
         runActionScan().catch((err) =>
           logger.error('runActionScan failed', { err })
