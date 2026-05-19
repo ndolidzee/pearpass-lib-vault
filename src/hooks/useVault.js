@@ -80,14 +80,18 @@ export const useVault = ({ variables } = {}) => {
     []
   )
 
-  // Copy peer renames into the per-device vault registry that backs useVaults.
+  // Patch peer renames into the local vault registry.
   const syncVaultNameToRegistry = async (vault) => {
     if (!vault?.id) return
     const localVault = (vaultsDataRef.current ?? []).find(
       (v) => v.id === vault.id
     )
     if (!localVault || localVault.name === vault.name) return
-    const { records, devices, ...registryVault } = vault
+    const registryVault = {
+      ...localVault,
+      name: vault.name,
+      updatedAt: vault.updatedAt ?? localVault.updatedAt
+    }
     try {
       await pearpassVaultClient.vaultsAdd(`vault/${vault.id}`, registryVault)
       await dispatch(getVaults())
