@@ -13,6 +13,7 @@ import { runActionScan } from '../api/actionRunner'
 import { checkVaultIsProtected } from '../api/checkVaultIsProtected'
 import { getCurrentVault } from '../api/getCurrentVault'
 import { initListener } from '../api/initListener'
+import { pearpassVaultClient } from '../instances'
 import { selectVault } from '../selectors/selectVault'
 import { selectVaults } from '../selectors/selectVaults'
 import { logger } from '../utils/logger'
@@ -59,7 +60,8 @@ import { logger } from '../utils/logger'
 export const useVault = ({ variables } = {}) => {
   const dispatch = useDispatch()
 
-  const { isLoading: isVaultsLoading } = useSelector(selectVaults)
+  const { isLoading: isVaultsLoading, data: vaultsData } =
+    useSelector(selectVaults)
 
   const {
     isLoading: isVaultLoading,
@@ -81,6 +83,23 @@ export const useVault = ({ variables } = {}) => {
 
     if (error) {
       throw new Error('Error fetching vault')
+    }
+
+    // Copy peer renames into the per-device vault registry that backs useVaults.
+    if (vault?.id) {
+      const localVault = (vaultsData ?? []).find((v) => v.id === vault.id)
+      if (localVault && localVault.name !== vault.name) {
+        const { records, devices, ...registryVault } = vault
+        try {
+          await pearpassVaultClient.vaultsAdd(
+            `vault/${vault.id}`,
+            registryVault
+          )
+          await dispatch(getVaults())
+        } catch (err) {
+          logger.error('vault name sync failed', { err })
+        }
+      }
     }
 
     await initListener({
