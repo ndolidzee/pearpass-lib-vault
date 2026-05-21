@@ -58,3 +58,4 @@ export { parseOtpInput } from './utils/parseOtpInput'
 
 export { findOtpDuplicates } from './api/findOtpDuplicates'
 export { useFindOtpDuplicates } from './hooks/useFindOtpDuplicates'
+export { exportOtpRecords } from './api/exportOtpRecords'
