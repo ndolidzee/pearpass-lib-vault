@@ -42,6 +42,7 @@ const mockClient = {
   vaultsGet: jest.fn(),
   vaultsRemove: jest.fn(),
   vaultsFind: jest.fn(),
+  decryptProtonExport: jest.fn(),
   signMessage: jest.fn(),
   verifySignature: jest.fn(),
   personalSwarmInit: jest.fn(),
