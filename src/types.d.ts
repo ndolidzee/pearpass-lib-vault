@@ -20,6 +20,7 @@ export declare function groupOtpRecords(
 export declare const ACTION_TYPES: {
   DELETE_VAULT: 'delete-vault'
   LEAVE_VAULT: 'leave-vault'
+  KICK_DEVICE: 'kick-device'
 } & Record<string, string>
 
 export declare const ACTIONS: Record<
