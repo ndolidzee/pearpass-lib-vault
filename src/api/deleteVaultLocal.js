@@ -32,7 +32,9 @@ export const deleteVaultLocal = async (vaultId) => {
         payload: { vaultId }
       })
     } catch (err) {
-      logger.error('deleteVaultLocal: leave broadcast failed', { err })
+      logger.error('deleteVaultLocal: leave broadcast failed', {
+        err: err?.message ?? String(err)
+      })
     }
   }
 
