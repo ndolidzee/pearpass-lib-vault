@@ -41,6 +41,7 @@ export { getDefaultFavicon } from './api/getDefaultFavicon.js'
 export { encryptExportData } from './api/encryptExportData.js'
 export { decryptExportData } from './api/decryptExportData.js'
 export { decryptProtonExport } from './api/decryptProtonExport.js'
+export { decryptAegisExport } from './api/decryptAegisExport.js'
 export { generateOtpCodesByIds } from './api/generateOtpCodesByIds.js'
 export { generateHotpNext } from './api/generateHotpNext.js'
 
