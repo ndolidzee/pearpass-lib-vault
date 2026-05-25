@@ -12,13 +12,18 @@ import { logger } from '../utils/logger'
  * swarm delivery happens asynchronously in processOutbox, so callers never
  * block on transport.
  *
- * @param {{ type: string, payload?: any }} action
+ * @param {{
+ *   type: string,
+ *   payload?: any,
+ *   targets?: string[]
+ * }} action - When `targets` is provided, only those device IDs are
+ *   addressed (self always excluded). Otherwise every paired peer is.
  * @returns {Promise<{
  *   results: Array<{ targetDeviceId: string, channel: 'outbox' }>,
  *   failures: Array<{ targetDeviceId: string, error: Error }>
  * }>}
  */
-export const broadcastAction = async ({ type, payload } = {}) => {
+export const broadcastAction = async ({ type, payload, targets } = {}) => {
   if (!type) {
     throw new Error('broadcastAction: type is required')
   }
@@ -33,7 +38,13 @@ export const broadcastAction = async ({ type, payload } = {}) => {
   }
 
   const devices = (await listDevices()) ?? []
-  const others = devices.filter((d) => d?.id && d.id !== myDeviceId)
+  const targetSet = Array.isArray(targets) ? new Set(targets) : null
+  const others = devices.filter(
+    (d) =>
+      d?.id &&
+      d.id !== myDeviceId &&
+      (targetSet === null || targetSet.has(d.id))
+  )
 
   const results = []
   const failures = []

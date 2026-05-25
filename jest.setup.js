@@ -22,6 +22,7 @@ const mockClient = {
   removeVault: jest.fn(),
   activeVaultInit: jest.fn(),
   activeVaultRemove: jest.fn(),
+  activeVaultRemoveWriter: jest.fn(),
   encryptionInit: jest.fn(),
   encryptionGet: jest.fn(),
   activeVaultGet: jest.fn(),

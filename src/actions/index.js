@@ -1,4 +1,5 @@
 import { deleteVaultActionHandler } from './handlers/deleteVault'
+import { kickDeviceActionHandler } from './handlers/kickDevice'
 import { leaveVaultActionHandler } from './handlers/leaveVault'
 import { ACTION_TYPES } from './types'
 
@@ -9,5 +10,6 @@ export { ACTION_TYPES }
 // envelope; processInbox bumps attempts and quarantines past the cap.
 export const ACTIONS = {
   [ACTION_TYPES.DELETE_VAULT]: deleteVaultActionHandler,
-  [ACTION_TYPES.LEAVE_VAULT]: leaveVaultActionHandler
+  [ACTION_TYPES.LEAVE_VAULT]: leaveVaultActionHandler,
+  [ACTION_TYPES.KICK_DEVICE]: kickDeviceActionHandler
 }

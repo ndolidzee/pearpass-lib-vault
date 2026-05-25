@@ -26,6 +26,7 @@ export {
 
 export { broadcastAction } from './api/broadcastAction'
 export { broadcastDeleteVault } from './api/broadcastDeleteVault'
+export { kickDevice } from './api/kickDevice'
 export { runActionScan } from './api/actionRunner'
 export { getMyDeviceId } from './utils/getMyDeviceId'
 

@@ -73,6 +73,39 @@ describe('broadcastAction', () => {
     expect(pearpassVaultClient.vaultsAdd).not.toHaveBeenCalled()
   })
 
+  it('addresses only the requested targets when a targets list is provided', async () => {
+    pearpassVaultClient.activeVaultList.mockResolvedValue([
+      { id: 'AAA', name: 'ios 18.0', writerKey: 'w-aaa' },
+      { id: 'BBB', name: 'macos 15.0', writerKey: 'w-bbb' },
+      { id: 'CCC', name: 'android 14', writerKey: 'w-ccc' }
+    ])
+
+    const { results } = await broadcastAction({
+      type: 'delete-vault',
+      payload: { reason: 'kick' },
+      targets: ['BBB']
+    })
+
+    expect(results.map((r) => r.targetDeviceId)).toEqual(['BBB'])
+    expect(pearpassVaultClient.vaultsAdd).toHaveBeenCalledTimes(1)
+  })
+
+  it('ignores targets that are unknown or self', async () => {
+    pearpassVaultClient.activeVaultList.mockResolvedValue([
+      { id: 'AAA', name: 'ios 18.0', writerKey: 'w-aaa' },
+      { id: 'BBB', name: 'macos 15.0', writerKey: 'w-bbb' }
+    ])
+
+    const { results } = await broadcastAction({
+      type: 'delete-vault',
+      payload: {},
+      targets: ['AAA', 'UNKNOWN']
+    })
+
+    expect(results).toEqual([])
+    expect(pearpassVaultClient.vaultsAdd).not.toHaveBeenCalled()
+  })
+
   it('reports partial failures without aborting other targets', async () => {
     pearpassVaultClient.activeVaultList.mockResolvedValue([
       { id: 'AAA', name: 'ios 18.0', writerKey: 'w-aaa' },

@@ -3,6 +3,7 @@ import { pearpassVaultClient } from '../instances'
 import { broadcastAction } from './broadcastAction'
 import { deleteVaultLocal } from './deleteVaultLocal'
 import { listVaults } from './listVaults'
+import { getMyDeviceId } from '../utils/getMyDeviceId'
 
 jest.mock('./listVaults', () => ({
   listVaults: jest.fn()
@@ -12,9 +13,14 @@ jest.mock('./broadcastAction', () => ({
   broadcastAction: jest.fn().mockResolvedValue({ results: [], failures: [] })
 }))
 
+jest.mock('../utils/getMyDeviceId', () => ({
+  getMyDeviceId: jest.fn()
+}))
+
 describe('deleteVaultLocal', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    getMyDeviceId.mockResolvedValue('SELF')
   })
 
   it('throws when vaultId is missing', async () => {
@@ -58,5 +64,28 @@ describe('deleteVaultLocal', () => {
 
     await expect(deleteVaultLocal('v1')).rejects.toThrow('boom')
     expect(listVaults).not.toHaveBeenCalled()
+  })
+
+  it('skips broadcastAction when our device entry is already gone (post-kick)', async () => {
+    getMyDeviceId.mockResolvedValueOnce(null)
+    const remaining = []
+    listVaults.mockResolvedValueOnce(remaining)
+
+    const result = await deleteVaultLocal('v1')
+
+    expect(broadcastAction).not.toHaveBeenCalled()
+    expect(pearpassVaultClient.removeVault).toHaveBeenCalledWith('v1')
+    expect(result).toBe(remaining)
+  })
+
+  it('skips broadcastAction when getMyDeviceId throws', async () => {
+    getMyDeviceId.mockRejectedValueOnce(new Error('boom'))
+    const remaining = []
+    listVaults.mockResolvedValueOnce(remaining)
+
+    await deleteVaultLocal('v1')
+
+    expect(broadcastAction).not.toHaveBeenCalled()
+    expect(pearpassVaultClient.removeVault).toHaveBeenCalledWith('v1')
   })
 })
