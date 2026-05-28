@@ -108,8 +108,9 @@ describe('usePair', () => {
 
       expect(result.current.isLoading).toBe(true)
 
+      jest.advanceTimersByTime(30000)
+
       await act(async () => {
-        jest.advanceTimersByTime(10000)
         await expect(promise).rejects.toThrow('Request timed out')
       })
 

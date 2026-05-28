@@ -21,11 +21,12 @@ describe('addDeviceFactory', () => {
     const mockId = '123-abc'
     const payload = 'ios'
     const vaultId = 'vault-456'
+    const writerKey = 'wk-test'
 
     generateUniqueId.mockReturnValue(mockId)
     validateAndPrepareDevice.mockImplementation((device) => device)
 
-    const result = addDeviceFactory(payload, vaultId)
+    const result = addDeviceFactory(payload, vaultId, writerKey)
 
     expect(generateUniqueId).toHaveBeenCalled()
     expect(validateAndPrepareDevice).toHaveBeenCalledWith(
@@ -33,6 +34,7 @@ describe('addDeviceFactory', () => {
         id: mockId,
         vaultId,
         name: 'ios',
+        writerKey,
         createdAt: 1749848117883
       })
     )

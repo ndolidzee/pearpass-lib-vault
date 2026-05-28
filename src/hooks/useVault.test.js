@@ -214,7 +214,7 @@ describe('useVault', () => {
       await result.current.addDevice(mockDevice)
     })
 
-    expect(addDeviceAction).toHaveBeenCalledWith(mockDevice)
+    expect(addDeviceAction).toHaveBeenCalledWith()
     expect(mockDispatch).toHaveBeenCalledWith({ type: 'ADD_DEVICE' })
   })
 

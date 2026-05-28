@@ -126,7 +126,6 @@ describe('useUserData', () => {
       await result.current.logIn({
         ciphertext: 'ciphertext123',
         nonce: 'nonce123',
-        salt: 'salt123',
         hashedPassword: 'hashedPassword123'
       })
     })
@@ -134,8 +133,8 @@ describe('useUserData', () => {
     expect(init).toHaveBeenCalledWith({
       ciphertext: 'ciphertext123',
       nonce: 'nonce123',
-      salt: 'salt123',
-      hashedPassword: 'hashedPassword123'
+      hashedPassword: 'hashedPassword123',
+      password: undefined
     })
   })
 

@@ -4,6 +4,11 @@ import { initWithPassword } from './initWithPassword'
 
 jest.mock('./initWithCredentials')
 jest.mock('./initWithPassword')
+jest.mock('../instances', () => ({
+  pearpassVaultClient: {
+    resetFailedAttempts: jest.fn()
+  }
+}))
 
 describe('init', () => {
   beforeEach(() => {

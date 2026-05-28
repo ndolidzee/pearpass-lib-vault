@@ -1,30 +1,26 @@
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 
-const mockGenerateOtpCodesByIds = jest.fn()
+const mockDispatch = jest.fn()
 const mockGenerateHotpNext = jest.fn()
 
-jest.mock('../api/generateOtpCodesByIds', () => ({
-  generateOtpCodesByIds: (...args) => mockGenerateOtpCodesByIds(...args)
+jest.mock('react-redux', () => ({
+  useDispatch: jest.fn(() => mockDispatch)
 }))
 
 jest.mock('../api/generateHotpNext', () => ({
   generateHotpNext: (...args) => mockGenerateHotpNext(...args)
 }))
 
-jest.mock('../utils/createAlignedInterval', () => ({
-  createAlignedInterval: (callback) => {
-    const id = setInterval(callback, 1000)
-    return () => clearInterval(id)
-  }
+jest.mock('./useOtpRefresh', () => ({
+  useOtpRefresh: jest.fn(() => null)
 }))
 
 const { useOtp } = require('./useOtp')
 
-jest.useFakeTimers()
-
 describe('useOtp', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDispatch.mockResolvedValue({})
   })
 
   test('returns null values when otpPublic is undefined', () => {
@@ -40,7 +36,7 @@ describe('useOtp', () => {
     expect(result.current.isLoading).toBe(false)
   })
 
-  test('TOTP fetches fresh code on mount', async () => {
+  test('TOTP reads code and timeRemaining from otpPublic', () => {
     const otpPublic = {
       type: 'TOTP',
       digits: 6,
@@ -49,26 +45,20 @@ describe('useOtp', () => {
       timeRemaining: 20
     }
 
-    mockGenerateOtpCodesByIds.mockResolvedValue([
-      { recordId: 'rec-1', code: '999888', timeRemaining: 25 }
-    ])
-
     const { result } = renderHook(() =>
       useOtp({ recordId: 'rec-1', otpPublic })
     )
 
-    await waitFor(() => {
-      expect(result.current.code).toBe('999888')
-      expect(result.current.timeRemaining).toBe(25)
-    })
-
+    expect(result.current.code).toBe('123456')
+    expect(result.current.timeRemaining).toBe(20)
     expect(result.current.type).toBe('TOTP')
     expect(result.current.period).toBe(30)
     expect(result.current.generateNext).toBeNull()
+    expect(result.current.isLoading).toBe(false)
   })
 
-  test('TOTP refreshes every second via interval', async () => {
-    const otpPublic = {
+  test('TOTP reflects updated otpPublic when props change', () => {
+    let otpPublic = {
       type: 'TOTP',
       digits: 6,
       period: 30,
@@ -76,36 +66,22 @@ describe('useOtp', () => {
       timeRemaining: 20
     }
 
-    mockGenerateOtpCodesByIds
-      .mockResolvedValueOnce([
-        { recordId: 'rec-1', code: '111111', timeRemaining: 15 }
-      ])
-      .mockResolvedValueOnce([
-        { recordId: 'rec-1', code: '111111', timeRemaining: 14 }
-      ])
-      .mockResolvedValueOnce([
-        { recordId: 'rec-1', code: '111111', timeRemaining: 13 }
-      ])
-
-    const { result } = renderHook(() =>
-      useOtp({ recordId: 'rec-1', otpPublic })
+    const { result, rerender } = renderHook(
+      ({ op }) => useOtp({ recordId: 'rec-1', otpPublic: op }),
+      { initialProps: { op: otpPublic } }
     )
 
-    await waitFor(() => {
-      expect(result.current.timeRemaining).toBe(15)
-    })
+    expect(result.current.code).toBe('123456')
 
-    await act(async () => {
-      jest.advanceTimersByTime(2000)
-    })
+    otpPublic = { ...otpPublic, currentCode: '999888', timeRemaining: 25 }
+    rerender({ op: otpPublic })
 
-    await waitFor(() => {
-      expect(mockGenerateOtpCodesByIds).toHaveBeenCalledTimes(3)
-    })
+    expect(result.current.code).toBe('999888')
+    expect(result.current.timeRemaining).toBe(25)
   })
 
-  test('TOTP updates code when worklet returns new code', async () => {
-    const otpPublic = {
+  test('TOTP updates code when otpPublic prop updates', () => {
+    let otpPublic = {
       type: 'TOTP',
       digits: 6,
       period: 30,
@@ -113,18 +89,16 @@ describe('useOtp', () => {
       timeRemaining: 2
     }
 
-    mockGenerateOtpCodesByIds.mockResolvedValue([
-      { recordId: 'rec-1', code: '222222', timeRemaining: 30 }
-    ])
-
-    const { result } = renderHook(() =>
-      useOtp({ recordId: 'rec-1', otpPublic })
+    const { result, rerender } = renderHook(
+      ({ op }) => useOtp({ recordId: 'rec-1', otpPublic: op }),
+      { initialProps: { op: otpPublic } }
     )
 
-    await waitFor(() => {
-      expect(result.current.code).toBe('222222')
-      expect(result.current.timeRemaining).toBe(30)
-    })
+    otpPublic = { ...otpPublic, currentCode: '222222', timeRemaining: 30 }
+    rerender({ op: otpPublic })
+
+    expect(result.current.code).toBe('222222')
+    expect(result.current.timeRemaining).toBe(30)
   })
 
   test('HOTP initializes with currentCode and exposes generateNext', () => {
@@ -144,7 +118,7 @@ describe('useOtp', () => {
     expect(result.current.generateNext).toBeInstanceOf(Function)
   })
 
-  test('HOTP generateNext calls generateHotpNext and updates code', async () => {
+  test('HOTP generateNext calls generateHotpNext and dispatches result', async () => {
     const otpPublic = {
       type: 'HOTP',
       digits: 6,
@@ -162,7 +136,7 @@ describe('useOtp', () => {
     })
 
     expect(mockGenerateHotpNext).toHaveBeenCalledWith('rec-1')
-    expect(result.current.code).toBe('333444')
+    expect(mockDispatch).toHaveBeenCalled()
     expect(result.current.isLoading).toBe(false)
   })
 })

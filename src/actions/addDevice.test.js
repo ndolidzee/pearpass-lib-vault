@@ -102,7 +102,8 @@ describe('addDevice', () => {
       vaultId: mockVaultId,
       name: mockDeviceName,
       writerKey: mockWriterKey,
-      createdAt: 0
+      createdAt: 0,
+      masterTopic: null
     }
     getState.mockReturnValueOnce({
       vault: {

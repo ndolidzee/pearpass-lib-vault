@@ -13,6 +13,7 @@ describe('selectRecords', () => {
   })
 
   const mockState = {
+    otp: { codes: {} },
     vault: {
       isLoading: false,
       data: {
@@ -330,6 +331,7 @@ describe('selectRecords', () => {
 
   test('should filter by hasOtp — only records with otpPublic', () => {
     const stateWithOtp = {
+      otp: { codes: {} },
       vault: {
         isLoading: false,
         data: {
@@ -365,6 +367,7 @@ describe('selectRecords', () => {
 
   test('should return all records when hasOtp is false or not set', () => {
     const stateWithOtp = {
+      otp: { codes: {} },
       vault: {
         isLoading: false,
         data: {
@@ -392,7 +395,7 @@ describe('selectRecords', () => {
   })
 
   test('should handle empty state gracefully', () => {
-    const emptyState = { vault: {} }
+    const emptyState = { otp: { codes: {} }, vault: {} }
     const selector = selectRecords()
     const result = selector(emptyState)
 

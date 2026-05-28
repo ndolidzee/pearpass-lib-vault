@@ -1,5 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux'
 
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  useCallback: (fn) => fn
+}))
+
 import { useInvite } from './useInvite.js'
 import { createInvite as createInviteAction } from '../actions/createInvite'
 import { deleteInvite as deleteInviteAction } from '../actions/deleteInvite'

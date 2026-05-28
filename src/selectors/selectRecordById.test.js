@@ -6,7 +6,8 @@ describe('selectRecordById', () => {
       vault: {
         isRecordLoading: true,
         data: null
-      }
+      },
+      otp: { codes: {} }
     }
 
     const selector = selectRecordById('123')
@@ -27,7 +28,8 @@ describe('selectRecordById', () => {
             { id: '222', name: 'Another Record' }
           ]
         }
-      }
+      },
+      otp: { codes: {} }
     }
 
     const selector = selectRecordById('123')
@@ -47,7 +49,8 @@ describe('selectRecordById', () => {
             { id: '222', name: 'Another Record' }
           ]
         }
-      }
+      },
+      otp: { codes: {} }
     }
 
     const selector = selectRecordById('123')
@@ -62,7 +65,8 @@ describe('selectRecordById', () => {
       vault: {
         isRecordLoading: false,
         data: null
-      }
+      },
+      otp: { codes: {} }
     }
 
     const selector = selectRecordById('123')
