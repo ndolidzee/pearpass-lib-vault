@@ -31,7 +31,8 @@ describe('validateAndPreparePassPhraseData', () => {
       title: 'My Passphrase',
       passPhrase: 'correct horse battery staple',
       note: 'This is my secure passphrase',
-      customFields: [{ name: 'Category', value: 'Security', type: 'text' }]
+      customFields: [{ name: 'Category', value: 'Security', type: 'text' }],
+      attachments: undefined
     })
   })
 
@@ -49,7 +50,8 @@ describe('validateAndPreparePassPhraseData', () => {
       title: 'Basic Passphrase',
       passPhrase: 'simple passphrase',
       note: undefined,
-      customFields: []
+      customFields: [],
+      attachments: undefined
     })
   })
 
@@ -70,8 +72,40 @@ describe('validateAndPreparePassPhraseData', () => {
       title: 'Passphrase',
       passPhrase: 'my passphrase',
       note: 'Passphrase description',
-      customFields: []
+      customFields: [],
+      attachments: undefined
     })
+  })
+
+  test('should include attachments in result', () => {
+    const attachments = [
+      { id: 'file-1', name: 'photo.png' },
+      { id: 'file-2', name: 'doc.pdf' }
+    ]
+    const passPhraseData = {
+      title: 'My Passphrase',
+      passPhrase: 'correct horse battery staple',
+      attachments
+    }
+
+    validateAndPrepareCustomFields.mockReturnValue([])
+
+    const result = validateAndPreparePassPhraseData(passPhraseData)
+
+    expect(result.attachments).toEqual(attachments)
+  })
+
+  test('should be valid without attachments', () => {
+    const passPhraseData = {
+      title: 'My Passphrase',
+      passPhrase: 'correct horse battery staple'
+    }
+
+    validateAndPrepareCustomFields.mockReturnValue([])
+
+    expect(() =>
+      validateAndPreparePassPhraseData(passPhraseData)
+    ).not.toThrow()
   })
 
   test('should throw error for missing required title', () => {

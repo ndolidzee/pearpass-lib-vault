@@ -31,7 +31,8 @@ describe('validateAndPrepareWifiPasswordData', () => {
       title: 'My WiFi Network',
       password: 'wifi123456',
       note: 'This is my home WiFi',
-      customFields: [{ name: 'SSID', value: 'MyNetwork', type: 'text' }]
+      customFields: [{ name: 'SSID', value: 'MyNetwork', type: 'text' }],
+      attachments: undefined
     })
   })
 
@@ -49,7 +50,8 @@ describe('validateAndPrepareWifiPasswordData', () => {
       title: 'Basic WiFi',
       password: 'password123',
       note: undefined,
-      customFields: []
+      customFields: [],
+      attachments: undefined
     })
   })
 
@@ -70,7 +72,8 @@ describe('validateAndPrepareWifiPasswordData', () => {
       title: 'WiFi Network',
       password: 'password123',
       note: 'Network description',
-      customFields: []
+      customFields: [],
+      attachments: undefined
     })
   })
 
@@ -91,8 +94,40 @@ describe('validateAndPrepareWifiPasswordData', () => {
       title: 'WiFi Network',
       password: 'password123',
       note: 'Network description',
-      customFields: []
+      customFields: [],
+      attachments: undefined
     })
+  })
+
+  test('should include attachments in result', () => {
+    const attachments = [
+      { id: 'file-1', name: 'photo.png' },
+      { id: 'file-2', name: 'doc.pdf' }
+    ]
+    const wifiPasswordData = {
+      title: 'WiFi Network',
+      password: 'password123',
+      attachments
+    }
+
+    validateAndPrepareCustomFields.mockReturnValue([])
+
+    const result = validateAndPrepareWifiPasswordData(wifiPasswordData)
+
+    expect(result.attachments).toEqual(attachments)
+  })
+
+  test('should be valid without attachments', () => {
+    const wifiPasswordData = {
+      title: 'WiFi Network',
+      password: 'password123'
+    }
+
+    validateAndPrepareCustomFields.mockReturnValue([])
+
+    expect(() =>
+      validateAndPrepareWifiPasswordData(wifiPasswordData)
+    ).not.toThrow()
   })
 
   test('should throw error for missing required title', () => {

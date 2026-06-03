@@ -4,12 +4,14 @@ import {
   customFieldSchema,
   validateAndPrepareCustomFields
 } from './validateAndPrepareCustomFields'
+import { fileSchema } from '../schemas/fileSchema'
 
 export const wifiPasswordSchema = Validator.object({
   title: Validator.string().required(),
   password: Validator.string().required(),
   note: Validator.string(),
-  customFields: Validator.array().items(customFieldSchema)
+  customFields: Validator.array().items(customFieldSchema),
+  attachments: Validator.array().items(fileSchema)
 })
 
 export const validateAndPrepareWifiPasswordData = (wifiPassword) => {
@@ -17,7 +19,8 @@ export const validateAndPrepareWifiPasswordData = (wifiPassword) => {
     title: wifiPassword.title,
     password: wifiPassword.password,
     note: wifiPassword.note,
-    customFields: validateAndPrepareCustomFields(wifiPassword.customFields)
+    customFields: validateAndPrepareCustomFields(wifiPassword.customFields),
+    attachments: wifiPassword.attachments
   }
 
   const errors = wifiPasswordSchema.validate(wifiPasswordData)
